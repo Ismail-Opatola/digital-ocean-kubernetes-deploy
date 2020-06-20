@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: do-kubernetes-sample-app
+  namespace: default
+  labels:
+    app: do-kubernetes-sample-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: do-kubernetes-sample-app
+  template:
+    metadata:
+      labels:
+        app: do-kubernetes-sample-app
+    spec:
+      containers:
+        - name: do-kubernetes-sample-app
+          image: turfff/do-kubernetes-sample-app:latest
+          ports:
+            - containerPort: 80
+              name: http
+
+# Kubernetes deployments are from the API group apps, so the apiVersion of your manifest is set to apps/v1. On metadata you added a new field you have not used previously, called metadata.labels. This is useful to organize your deployments. The field spec represents the behavior specification of your deployment. A deployment is responsible for managing one or more pods; in this case it’s going to have a single replica by the spec.replicas field. That is, it’s going to create and manage a single pod.
+
+# To manage pods, your deployment must know which pods it’s responsible for. The spec.selector field is the one that gives it that information. In this case the deployment will be responsible for all pods with tags app=do-kubernetes-sample-app. The spec.template field contains the details of the Pod this deployment will create. Inside the template you also have a spec.template.metadata field. The labels inside this field must match the ones used on spec.selector. spec.template.spec is the specification of the pod itself. In this case it contains a single container, called do-kubernetes-sample-app. The image of that container is the image you built previously and pushed to Docker Hub.

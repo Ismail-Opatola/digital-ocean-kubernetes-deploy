@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: do-kubernetes-sample-app
+  namespace: default
+  labels:
+    app: do-kubernetes-sample-app
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      name: http
+  selector:
+    app: do-kubernetes-sample-app
+
+# This file gives your Service the same labels used on your deployment. This is not required, but it helps to organize your applications on Kubernetes.
+
+# The service resource also has a spec field. The `spec.type` field is responsible for the behavior of the service. In this case it’s a `ClusterIP`, which means the service is exposed on a cluster-internal IP, and is only reachable from within your cluster. This is the default spec.type for services. `spec.selector` is the label selector criteria that should be used when picking the pods to be exposed by this service. Since your pod has the tag `app: do-kubernetes-sample-app`, you used it here. `spec.ports` are the ports exposed by the pod’s containers that you want to expose from this service. Your pod has a single container which exposes port `80`, named http, so you are using it here as `targetPort`. The service exposes that port on port `80` too, with the same name, but you could have used a different port/name combination than the one from the container.
