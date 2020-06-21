@@ -1,0 +1,37 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    environment:
+      IMAGE_NAME: turfff/do-kubernetes-sample-app
+    working_directory: ~/app
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t $IMAGE_NAME:latest .
+      - run:
+          name: Push Docker Image
+          command: |
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker push $IMAGE_NAME:latest
+workflows:
+  version: 2
+  build-master:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: master
+
+# This sets up a Workflow with a single job, called build, that runs for every commit to the master branch. This job is using the image circleci/buildpack-deps:stretch to run its steps, which is an image from CircleCI based on the official buildpack-deps Docker image, but with some extra tools installed, like Docker binaries themselves.
+
+# The workflow has four steps:
+
+# checkout retrieves the code from GitHub.
+# setup_remote_docker sets up a remote, isolated environment for each build. This is required before you use any docker command inside a job step. This is necessary because as the steps are running inside a docker image, setup_remote_docker allocates another machine to run the commands there.
+# The first run step builds the image, as you did previously locally. For that you are using the environment variable you declared in environment:, IMAGE_NAME (remember to change the highlighted section with your own information).
+# The last run step pushes the image to Dockerhub, using the environment variables you configured on the project settings to authenticate.
